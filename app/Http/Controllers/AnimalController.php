@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Animal;
+use App\Models\Shelter;
+use Illuminate\Http\Request;
 
 class AnimalController extends Controller
 {
@@ -20,5 +23,22 @@ class AnimalController extends Controller
         $animal = Animal::with(['shelter', 'tags'])->findOrFail($id);
 
         return view('animals.show', ['animal' => $animal]);
+    }
+    public function create()
+    {
+        return view('animals.create', [
+            'shelters' => Shelter::orderBy('name')->get(),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $animal = Animal::create(
+            $request->only(['name', 'species', 'shelter_id', 'birth_date', 'description'])
+        );
+
+        return redirect()
+            ->route('animals.show', $animal->id)
+            ->with('status', "L'animal a été ajouté.");
     }
 }

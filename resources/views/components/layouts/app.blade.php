@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +10,7 @@
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="flex min-h-screen flex-col bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">
     {{-- Les liens du menu sont écrits en dur (href="/animaux") et non avec route('animals.index') :
          tant que la route n'existe pas, route() ferait planter toutes les pages, /composants compris. --}}
@@ -24,8 +26,7 @@
                 id="menu-button"
                 class="group rounded-md p-2 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-2 focus-visible:outline-brand-600 md:hidden dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
                 aria-controls="main-menu"
-                aria-expanded="false"
-            >
+                aria-expanded="false">
                 <span class="sr-only">Menu</span>
                 <svg class="size-6 group-aria-expanded:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
                     <path d="M4 6h16M4 12h16M4 18h16" />
@@ -46,7 +47,9 @@
 
     <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         {{-- Kata 17.2 : le message flash (@session('status')) s'affiche ici, au-dessus du contenu de la page. --}}
-
+        @session('status')
+        <p role="status">{{ $value }}</p>
+        @endsession
         {{ $slot }}
     </main>
 
@@ -57,4 +60,5 @@
         </div>
     </footer>
 </body>
+
 </html>
