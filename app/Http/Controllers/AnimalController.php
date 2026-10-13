@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Http\Requests\AnimalRequest;
 use App\Models\Animal;
 use App\Models\Shelter;
-use Illuminate\Http\Request;
-use App\Enums\Species;
-use Illuminate\Validation\Rule;
+use App\Models\Tag;
 
 class AnimalController extends Controller
 {
@@ -20,33 +18,52 @@ class AnimalController extends Controller
 
         return view('animals.index', ['animals' => $animals]);
     }
+
     public function show($id)
     {
         $animal = Animal::with(['shelter', 'tags'])->findOrFail($id);
 
         return view('animals.show', ['animal' => $animal]);
     }
+
     public function create()
     {
         return view('animals.create', [
+            'animal' => new Animal,
             'shelters' => Shelter::orderBy('name')->get(),
+            'tags' => Tag::orderBy('name')->get(),
         ]);
     }
 
-    public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name' => ['required', 'string', 'max:50'],
-        'species' => ['required', Rule::enum(Species::class)],
-        'shelter_id' => ['required', 'integer', 'exists:shelters,id'],
-        'birth_date' => ['nullable', 'date', 'before_or_equal:today'],
-        'description' => ['nullable', 'string', 'max:1000'],
-    ]);
+    public function store(AnimalRequest $request)
+    {
+        $animal = Animal::create($request->safe()->except('tags'));
+        $animal->tags()->sync($request->validated('tags') ?? []);
 
-    $animal = Animal::create($validated);
+        return redirect()
+            ->route('animals.show', $animal->id)
+            ->with('status', "L'animal a été ajouté.");
+    }
 
-    return redirect()
-        ->route('animals.show', $animal->id)
-        ->with('status', "L'animal a été ajouté.");
-}
+    public function edit($id)
+    {
+        $animal = Animal::with('tags')->findOrFail($id);
+
+        return view('animals.edit', [
+            'animal' => $animal,
+            'shelters' => Shelter::orderBy('name')->get(),
+            'tags' => Tag::orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(AnimalRequest $request, $id)
+    {
+        $animal = Animal::findOrFail($id);
+        $animal->update($request->safe()->except('tags'));
+        $animal->tags()->sync($request->validated('tags') ?? []);
+
+        return redirect()
+            ->route('animals.show', $animal->id)
+            ->with('status', "L'animal a été modifié.");
+    }
 }
