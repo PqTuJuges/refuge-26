@@ -78,5 +78,14 @@ class AnimalController extends Controller
             ->route('animals.show', $animal->id)
             ->with('status', "{$animal->name} a trouvé une famille.");
     }
+        public function destroy($id)
+    {
+        $animal = Animal::findOrFail($id);
+        $animal->delete();
+
+        return redirect()
+            ->route('animals.index')
+            ->with('status', "L'animal a été supprimé.");
+    }
 
 }

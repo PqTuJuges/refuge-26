@@ -35,6 +35,12 @@
                     <x-button type="submit">Adopter</x-button>
                 </form>
             @endif
+
+            <form method="POST" action="{{ route('animals.destroy', $animal->id) }}" onsubmit="return confirm('Supprimer cet animal ?')">
+                @csrf
+                @method('DELETE')
+                <x-button type="submit" variant="danger">Supprimer</x-button>
+            </form>
         </div>
     </article>
 </x-layouts.app>
