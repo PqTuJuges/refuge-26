@@ -66,4 +66,17 @@ class AnimalController extends Controller
             ->route('animals.show', $animal->id)
             ->with('status', "L'animal a été modifié.");
     }
+        public function adopt($id)
+    {
+        $animal = Animal::findOrFail($id);
+
+        if (! $animal->isAdopted()) {
+            $animal->update(['adopted_at' => today()]);
+        }
+
+        return redirect()
+            ->route('animals.show', $animal->id)
+            ->with('status', "{$animal->name} a trouvé une famille.");
+    }
+
 }
