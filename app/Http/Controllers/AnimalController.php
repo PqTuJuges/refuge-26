@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use App\Models\Animal;
 use App\Models\Shelter;
 use Illuminate\Http\Request;
+use App\Enums\Species;
+use Illuminate\Validation\Rule;
 
 class AnimalController extends Controller
 {
@@ -32,13 +34,19 @@ class AnimalController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $animal = Animal::create(
-            $request->only(['name', 'species', 'shelter_id', 'birth_date', 'description'])
-        );
+{
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:50'],
+        'species' => ['required', Rule::enum(Species::class)],
+        'shelter_id' => ['required', 'integer', 'exists:shelters,id'],
+        'birth_date' => ['nullable', 'date', 'before_or_equal:today'],
+        'description' => ['nullable', 'string', 'max:1000'],
+    ]);
 
-        return redirect()
-            ->route('animals.show', $animal->id)
-            ->with('status', "L'animal a été ajouté.");
-    }
+    $animal = Animal::create($validated);
+
+    return redirect()
+        ->route('animals.show', $animal->id)
+        ->with('status', "L'animal a été ajouté.");
+}
 }
